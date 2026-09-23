@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerCustomer } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 import { User, Mail, Lock, Phone, UserPlus, AlertCircle, ShoppingBag } from "lucide-react";
 
 const Register = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/home");
+    }
+  }, [user, navigate]);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -73,14 +81,14 @@ const Register = () => {
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50">
         <div className="text-center">
-          <div className="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 items-center justify-center text-white shadow-lg shadow-blue-500/30 mb-4">
+          <div className="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-500 items-center justify-center text-white shadow-lg shadow-red-500/30 mb-4">
             <ShoppingBag className="w-7 h-7" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
             Create an Account
           </h2>
-          <p className="mt-2 text-sm text-slate-500">
-            Join ShopKart today to start shopping quality products
+          <p className="mt-2 text-sm text-slate-500 font-medium">
+            Join ShopKart today to start shopping latest gadgets
           </p>
         </div>
 
@@ -191,7 +199,7 @@ const Register = () => {
                 className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
                   errors.phone
                     ? "border-rose-300 focus:ring-rose-500"
-                    : "border-slate-200 focus:ring-blue-500"
+                    : "border-slate-200 focus:ring-red-500"
                 }`}
               />
             </div>
@@ -204,7 +212,7 @@ const Register = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 shadow-md shadow-blue-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            className="w-full py-3.5 px-4 rounded-full text-sm font-bold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 shadow-md shadow-red-600/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             <UserPlus className="w-4 h-4" />
             <span>{isSubmitting ? "Creating Account..." : "Create Account"}</span>
@@ -216,7 +224,7 @@ const Register = () => {
             Already have an account?{" "}
             <Link
               to="/login"
-              className="font-bold text-blue-600 hover:text-blue-700 hover:underline"
+              className="font-bold text-red-600 hover:text-red-700 hover:underline"
             >
               Log in
             </Link>

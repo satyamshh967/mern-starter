@@ -84,7 +84,7 @@ const Home = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8 sm:p-10 text-white shadow-xl shadow-blue-500/20 mb-8">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-red-600 via-rose-600 to-slate-900 p-8 sm:p-10 text-white shadow-xl shadow-red-500/20 mb-8">
         <div className="relative z-10 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold uppercase tracking-wider mb-4">
             <Sparkles className="w-3.5 h-3.5" />
@@ -93,23 +93,23 @@ const Home = () => {
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
             Welcome, {user.fullName}!
           </h1>
-          <p className="mt-2 text-blue-100 text-sm sm:text-base leading-relaxed">
+          <p className="mt-2 text-rose-100 text-sm sm:text-base leading-relaxed">
             Your ShopKart account is fully active and secured with HttpOnly JWT
-            cookies. Discover our curated catalog of products today.
+            cookies. Discover our curated catalog of tech gadgets today.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-blue-700 font-bold text-sm hover:bg-blue-50 transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-slate-900 font-bold text-sm hover:bg-slate-100 transition-colors shadow-sm"
             >
-              <ShoppingBag className="w-4 h-4" />
-              <span>Browse Products</span>
+              <ShoppingBag className="w-4 h-4 text-red-600" />
+              <span>Browse Catalog</span>
             </Link>
 
             <button
               onClick={() => setShowPasswordModal(true)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium text-sm backdrop-blur-sm transition-colors border border-white/20"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium text-sm backdrop-blur-sm transition-colors border border-white/20"
             >
               <KeyRound className="w-4 h-4" />
               <span>Change Password</span>
@@ -130,10 +130,10 @@ const Home = () => {
                 Customer Profile
               </h2>
               <p className="text-xs text-slate-500">
-                Fetched directly from <code className="text-blue-600 bg-blue-50 px-1 py-0.5 rounded">GET /customers/me</code>
+                Fetched directly from <code className="text-red-600 bg-red-50 px-1.5 py-0.5 rounded font-mono">GET /customers/me</code>
               </p>
             </div>
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center">
               <ShieldCheck className="w-5 h-5" />
             </div>
           </div>
@@ -141,7 +141,7 @@ const Home = () => {
           <div className="mt-6 space-y-4">
             <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
               <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-slate-600">
-                <User className="w-5 h-5 text-blue-600" />
+                <User className="w-5 h-5 text-red-600" />
               </div>
               <div>
                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
@@ -155,7 +155,7 @@ const Home = () => {
 
             <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
               <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-slate-600">
-                <Mail className="w-5 h-5 text-blue-600" />
+                <Mail className="w-5 h-5 text-red-600" />
               </div>
               <div>
                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
@@ -169,7 +169,7 @@ const Home = () => {
 
             <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
               <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-slate-600">
-                <Phone className="w-5 h-5 text-blue-600" />
+                <Phone className="w-5 h-5 text-red-600" />
               </div>
               <div>
                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
@@ -216,7 +216,7 @@ const Home = () => {
           <div className="mt-6 pt-6 border-t border-slate-100">
             <Link
               to="/products"
-              className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+              className="w-full py-3 px-4 rounded-full bg-slate-900 hover:bg-red-600 text-white text-xs font-bold flex items-center justify-center gap-2 transition-colors"
             >
               <span>Explore Product Catalog</span>
               <ShoppingBag className="w-4 h-4" />

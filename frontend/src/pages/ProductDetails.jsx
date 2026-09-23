@@ -127,7 +127,7 @@ const ProductDetails = () => {
         <div className="flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
+              <span className="text-xs font-bold uppercase tracking-wider text-red-600">
                 {product.category}
               </span>
 
@@ -168,22 +168,22 @@ const ProductDetails = () => {
 
             {/* Perks / Features */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
-              <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                <Truck className="w-4 h-4 text-blue-600 flex-shrink-0" />
+              <div className="flex items-center gap-2 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                <Truck className="w-4 h-4 text-red-600 flex-shrink-0" />
                 <span className="text-xs font-medium text-slate-700">
                   Fast Express Delivery
                 </span>
               </div>
-              <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                <Shield className="w-4 h-4 text-blue-600 flex-shrink-0" />
+              <div className="flex items-center gap-2 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                <Shield className="w-4 h-4 text-red-600 flex-shrink-0" />
                 <span className="text-xs font-medium text-slate-700">
                   1-Year Warranty
                 </span>
               </div>
-              <div className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                <RotateCcw className="w-4 h-4 text-blue-600 flex-shrink-0" />
+              <div className="flex items-center gap-2 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                <RotateCcw className="w-4 h-4 text-red-600 flex-shrink-0" />
                 <span className="text-xs font-medium text-slate-700">
-                  7-Day Returns
+                  30-Day Returns
                 </span>
               </div>
             </div>
@@ -201,7 +201,7 @@ const ProductDetails = () => {
             <button
               onClick={handleAddToCart}
               disabled={isOutOfStock}
-              className="w-full py-4 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition-all cursor-pointer"
+              className="w-full py-4 px-6 rounded-full bg-red-600 hover:bg-red-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-red-600/30 transition-all cursor-pointer"
             >
               <ShoppingCart className="w-5 h-5" />
               <span>
