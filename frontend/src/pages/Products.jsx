@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { getProducts } from "../services/api";
+import { getProducts, getWishlist } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
 import {
@@ -22,14 +23,31 @@ import {
 } from "lucide-react";
 
 const Products = () => {
+  const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [wishlistIds, setWishlistIds] = useState(new Set());
 
   // Filter States
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("");
+
+  // Fetch user's wishlist to know which products are wishlisted
+  useEffect(() => {
+    const fetchUserWishlist = async () => {
+      if (!user) return;
+      try {
+        const data = await getWishlist();
+        const ids = new Set((data.wishlist || []).map((p) => p._id));
+        setWishlistIds(ids);
+      } catch {
+        // silently ignore
+      }
+    };
+    fetchUserWishlist();
+  }, [user]);
 
   const fetchProductList = async () => {
     setLoading(true);
@@ -377,7 +395,19 @@ const Products = () => {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {products.map((product) => (
-              <ProductCard key={product._id} product={product} />
+              <ProductCard
+                key={product._id}
+                product={product}
+                isInWishlist={wishlistIds.has(product._id)}
+                onWishlistChange={(id, added) => {
+                  setWishlistIds((prev) => {
+                    const next = new Set(prev);
+                    if (added) next.add(id);
+                    else next.delete(id);
+                    return next;
+                  });
+                }}
+              />
             ))}
           </div>
         )}

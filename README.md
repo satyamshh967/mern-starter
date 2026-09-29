@@ -1,6 +1,6 @@
 # ShopKart — Fullstack E-Commerce Platform
 
-A modern, fullstack e-commerce web application featuring secure customer authentication with JWT and HttpOnly cookies, responsive product catalog discovery, category filtering, search, and detailed product views.
+A modern, fullstack e-commerce web application featuring secure customer authentication with JWT and HttpOnly cookies, responsive product catalog discovery, category filtering, search, detailed product views, and a persistent wishlist experience.
 
 ---
 
@@ -21,6 +21,15 @@ A modern, fullstack e-commerce web application featuring secure customer authent
 - **Price Sorting**: Sort by ascending or descending price.
 - **Single Product View**: Detailed product page displaying high-resolution images, descriptions, live stock indicators, delivery badges, and an interactive Add-to-Cart workflow.
 - **State Handling**: Polished skeleton loading states, informative error states with retry actions, and empty states.
+
+### ♥️ Wishlist
+- **Persistent Wishlist**: Backend-driven wishlist stored as ObjectId references in the Customer model — not frontend state.
+- **Toggle Heart Button**: One-click ♡/♥ toggle on every product card with loading spinner feedback.
+- **Dedicated Wishlist Page**: Full `/wishlist` page with loading skeleton, empty state CTA, error handling, and remove button.
+- **Navbar Badge**: Live wishlist count badge in the navigation bar, refreshed on every route change.
+- **Duplicate Prevention**: Backend returns 409 Conflict if the same product is added twice.
+- **Edge Case Handling**: Invalid product ID (400), product not found (404), unauthenticated (401), not in wishlist (404).
+- **Bonus Toggle Endpoint**: `PATCH /wishlist/:productId/toggle` — adds if absent, removes if present.
 
 ---
 
@@ -52,13 +61,15 @@ Mern/
 ├── backend/
 │   ├── controllers/
 │   │   ├── customer.controller.js  # Customer registration, login, profile, logout
-│   │   └── product.controller.js   # Product creation, listing, search, filtering
+│   │   ├── product.controller.js   # Product creation, listing, search, filtering
+│   │   └── wishlist.controller.js  # Wishlist add, get, remove, toggle
 │   ├── models/
-│   │   ├── customer.model.js       # Customer schema & validations
+│   │   ├── customer.model.js       # Customer schema (includes wishlist refs)
 │   │   └── product.model.js        # Product schema & validations
 │   ├── routes/
 │   │   ├── customer.routes.js      # /customers endpoints
-│   │   └── product.routes.js       # /products endpoints
+│   │   ├── product.routes.js       # /products endpoints
+│   │   └── wishlist.routes.js      # /wishlist endpoints (all protected)
 │   ├── middlewares/
 │   │   └── auth.middleware.js      # JWT cookie verification middleware
 │   ├── utils/
@@ -66,7 +77,8 @@ Mern/
 │   │   └── seedProducts.js         # Mock product seeder
 │   ├── tests/
 │   │   ├── customer.test.js        # Authentication test suite
-│   │   └── product.test.js         # Product API test suite
+│   │   ├── product.test.js         # Product API test suite
+│   │   └── wishlist.test.js        # Wishlist API test suite
 │   ├── index.js                    # Express app entrypoint & MongoDB connection
 │   ├── package.json
 │   └── .env
@@ -74,15 +86,16 @@ Mern/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Navbar.jsx          # Top navigation & user session badge
-│   │   │   ├── ProductCard.jsx     # Product card display
+│   │   │   ├── Navbar.jsx          # Top navigation, user session badge & wishlist count
+│   │   │   ├── ProductCard.jsx     # Product card with wishlist toggle button
 │   │   │   └── SearchBar.jsx       # Search input, category dropdown & sort selector
 │   │   ├── pages/
 │   │   │   ├── Register.jsx        # Account registration page
 │   │   │   ├── Login.jsx           # User login page
 │   │   │   ├── Home.jsx            # Protected customer dashboard
 │   │   │   ├── Products.jsx        # Product discovery catalog
-│   │   │   └── ProductDetails.jsx  # Single product details view
+│   │   │   ├── ProductDetails.jsx  # Single product details view
+│   │   │   └── Wishlist.jsx        # Wishlist page with remove & empty states
 │   │   ├── services/
 │   │   │   └── api.js              # Centralized Axios API client
 │   │   ├── context/
@@ -207,6 +220,17 @@ Visit [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
+### Wishlist (`/wishlist`) — All Protected
+
+| Method | Endpoint | Description | Status Codes |
+|---|---|---|---|
+| `POST` | `/wishlist/:productId` | Add product to wishlist | 200, 400, 404, 409 |
+| `GET` | `/wishlist` | Get wishlist with populated product data | 200 |
+| `DELETE` | `/wishlist/:productId` | Remove product from wishlist | 200, 400, 404 |
+| `PATCH` | `/wishlist/:productId/toggle` | Toggle product in/out of wishlist | 200, 400, 404 |
+
+---
+
 ## 🧪 Testing
 
 The backend includes a comprehensive Jest and Supertest suite:
@@ -216,4 +240,4 @@ cd backend
 npm test
 ```
 
-All 25 test cases run against a local test database and validate registration, bcrypt hashing, cookie generation, route protection, search, filtering, and error handling.
+All 39 test cases run against a local test database and validate registration, bcrypt hashing, cookie generation, route protection, search, filtering, wishlist CRUD operations, duplicate prevention, and error handling.

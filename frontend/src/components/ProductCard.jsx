@@ -1,13 +1,38 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Heart, Star, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowRight, Heart, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { toggleWishlist } from "../services/api";
 
-const ProductCard = ({ product }) => {
-  const [liked, setLiked] = useState(false);
+const ProductCard = ({ product, isInWishlist = false, onWishlistChange }) => {
+  const [wishlisted, setWishlisted] = useState(isInWishlist);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
   const isOutOfStock = product.stock <= 0;
 
   // Generate deterministic realistic like counts based on id
   const likes = Math.floor(1200 + (product.price % 800) * 1.5);
+
+  const handleWishlistToggle = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (wishlistLoading) return;
+
+    setWishlistLoading(true);
+    try {
+      const data = await toggleWishlist(product._id);
+      const nowWishlisted = data.action === "added";
+      setWishlisted(nowWishlisted);
+      if (onWishlistChange) {
+        onWishlistChange(product._id, nowWishlisted);
+      }
+    } catch (err) {
+      // If 401, user not logged in — silently ignore
+      if (err.response?.status !== 401) {
+        console.error("Wishlist toggle failed:", err.response?.data?.message || err.message);
+      }
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-slate-100 hover:border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group">
@@ -32,18 +57,24 @@ const ProductCard = ({ product }) => {
 
         {/* Heart / Wishlist Button */}
         <button
-          onClick={(e) => {
-            e.preventDefault();
-            setLiked(!liked);
-          }}
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-slate-400 hover:text-red-500 shadow-sm border border-slate-100 transition-colors"
-          title="Save to wishlist"
+          onClick={handleWishlistToggle}
+          disabled={wishlistLoading}
+          className={`absolute top-3 right-3 w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center shadow-sm border transition-all duration-200 ${
+            wishlisted
+              ? "bg-red-50 border-red-200 text-red-500"
+              : "bg-white/90 border-slate-100 text-slate-400 hover:text-red-500"
+          } ${wishlistLoading ? "opacity-70 cursor-wait" : "cursor-pointer"}`}
+          title={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
-          <Heart
-            className={`w-4 h-4 ${
-              liked ? "fill-red-500 text-red-500" : ""
-            } transition-colors`}
-          />
+          {wishlistLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-red-500" />
+          ) : (
+            <Heart
+              className={`w-4 h-4 transition-all duration-200 ${
+                wishlisted ? "fill-red-500 text-red-500 scale-110" : ""
+              }`}
+            />
+          )}
         </button>
       </div>
 

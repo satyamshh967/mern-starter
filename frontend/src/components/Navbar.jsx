@@ -1,11 +1,31 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { ShoppingBag, User, LogOut, LogIn, UserPlus, Sparkles } from "lucide-react";
+import { getWishlist } from "../services/api";
+import { ShoppingBag, User, LogOut, LogIn, UserPlus, Sparkles, Heart } from "lucide-react";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [wishlistCount, setWishlistCount] = useState(0);
+
+  // Fetch wishlist count when user is logged in or location changes
+  useEffect(() => {
+    const fetchCount = async () => {
+      if (!user) {
+        setWishlistCount(0);
+        return;
+      }
+      try {
+        const data = await getWishlist();
+        setWishlistCount((data.wishlist || []).length);
+      } catch {
+        setWishlistCount(0);
+      }
+    };
+    fetchCount();
+  }, [user, location.pathname]);
 
   const handleLogout = async () => {
     await logout();
@@ -52,6 +72,20 @@ const Navbar = () => {
 
             {user ? (
               <>
+                {/* Wishlist Link with Count Badge */}
+                <Link
+                  to="/wishlist"
+                  className="relative px-3 py-2 text-xs font-bold text-slate-700 hover:text-red-600 hover:bg-red-50/50 rounded-xl transition-colors flex items-center gap-1.5"
+                >
+                  <Heart className={`w-3.5 h-3.5 ${wishlistCount > 0 ? "fill-red-500 text-red-500" : "text-red-600"}`} />
+                  <span className="hidden sm:inline">Wishlist</span>
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center shadow-sm shadow-red-500/30 animate-in">
+                      {wishlistCount > 9 ? "9+" : wishlistCount}
+                    </span>
+                  )}
+                </Link>
+
                 <Link
                   to="/home"
                   className="px-3 py-2 text-xs font-bold text-slate-700 hover:text-red-600 hover:bg-slate-50 rounded-xl transition-colors flex items-center gap-2"

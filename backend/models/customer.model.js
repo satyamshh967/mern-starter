@@ -26,6 +26,7 @@ const customerSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
 });
 
 module.exports = mongoose.model("Customer", customerSchema);
