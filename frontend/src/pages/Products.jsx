@@ -34,6 +34,19 @@ const Products = () => {
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("");
 
+  // Newsletter State
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterSuccess, setNewsletterSuccess] = useState(false);
+
+  const handleNewsletterSubmit = (e) => {
+    e.preventDefault();
+    if (newsletterEmail.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newsletterEmail.trim())) {
+      setNewsletterSuccess(true);
+      setNewsletterEmail("");
+      setTimeout(() => setNewsletterSuccess(false), 5000);
+    }
+  };
+
   // Fetch user's wishlist to know which products are wishlisted
   useEffect(() => {
     const fetchUserWishlist = async () => {
@@ -470,24 +483,31 @@ const Products = () => {
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
             Ideas for Your Next Upgrade
           </h2>
-          <span className="text-xs font-bold text-red-600 hover:text-red-700 cursor-pointer">
+          <button
+            onClick={() => handleQuickCategory("All")}
+            className="text-xs font-bold text-red-600 hover:text-red-700 cursor-pointer"
+          >
             See All Collections →
-          </span>
+          </button>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {/* Tile 1 */}
-          <div className="relative rounded-2xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-sm">
+          {/* Tile 1: Tech Setup */}
+          <div
+            onClick={() => handleQuickCategory("Electronics")}
+            className="relative rounded-2xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+          >
             <img
               src="https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?auto=format&fit=crop&w=500&q=80"
               alt="Tech Setup Ideas"
+              loading="lazy"
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
             <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white">
               <div>
-                <h4 className="text-xs font-bold leading-tight">Tech Setup Ideas</h4>
-                <span className="text-[10px] text-slate-300">128 Ideas</span>
+                <h4 className="text-xs font-bold leading-tight">Keyboards & Audio</h4>
+                <span className="text-[10px] text-slate-300">Audiophile Gear</span>
               </div>
               <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
                 <ArrowRight className="w-3 h-3" />
@@ -495,18 +515,22 @@ const Products = () => {
             </div>
           </div>
 
-          {/* Tile 2 */}
-          <div className="relative rounded-2xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-sm">
+          {/* Tile 2: Travel Tech */}
+          <div
+            onClick={() => handleQuickCategory("Fashion")}
+            className="relative rounded-2xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+          >
             <img
               src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=500&q=80"
               alt="Travel Tech Essentials"
+              loading="lazy"
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
             <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white">
               <div>
-                <h4 className="text-xs font-bold leading-tight">Travel Tech</h4>
-                <span className="text-[10px] text-slate-300">96 Ideas</span>
+                <h4 className="text-xs font-bold leading-tight">Everyday Carry</h4>
+                <span className="text-[10px] text-slate-300">EDC & Leather</span>
               </div>
               <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
                 <ArrowRight className="w-3 h-3" />
@@ -514,18 +538,22 @@ const Products = () => {
             </div>
           </div>
 
-          {/* Tile 3 */}
-          <div className="relative rounded-2xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-sm">
+          {/* Tile 3: Smart Home */}
+          <div
+            onClick={() => handleQuickCategory("Home")}
+            className="relative rounded-2xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+          >
             <img
               src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=500&q=80"
               alt="Smart Home Inspiration"
+              loading="lazy"
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
             <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white">
               <div>
-                <h4 className="text-xs font-bold leading-tight">Smart Home</h4>
-                <span className="text-[10px] text-slate-300">74 Ideas</span>
+                <h4 className="text-xs font-bold leading-tight">Smart Workspace</h4>
+                <span className="text-[10px] text-slate-300">Lamps & Docks</span>
               </div>
               <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
                 <ArrowRight className="w-3 h-3" />
@@ -533,18 +561,22 @@ const Products = () => {
             </div>
           </div>
 
-          {/* Tile 4 */}
-          <div className="relative rounded-2xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-sm">
+          {/* Tile 4: Books */}
+          <div
+            onClick={() => handleQuickCategory("Books")}
+            className="relative rounded-2xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+          >
             <img
-              src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=500&q=80"
-              alt="Gaming Gear"
+              src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=500&q=80"
+              alt="Engineering Books"
+              loading="lazy"
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
             <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white">
               <div>
-                <h4 className="text-xs font-bold leading-tight">Gaming Gear</h4>
-                <span className="text-[10px] text-slate-300">155 Ideas</span>
+                <h4 className="text-xs font-bold leading-tight">Tech Books</h4>
+                <span className="text-[10px] text-slate-300">Engineering Classics</span>
               </div>
               <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
                 <ArrowRight className="w-3 h-3" />
@@ -552,18 +584,22 @@ const Products = () => {
             </div>
           </div>
 
-          {/* Tile 5 */}
-          <div className="hidden lg:block relative rounded-2xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-sm">
+          {/* Tile 5: Minimal Desk */}
+          <div
+            onClick={() => handleQuickCategory("Home")}
+            className="hidden lg:block relative rounded-2xl overflow-hidden aspect-[4/5] group cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+          >
             <img
               src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=500&q=80"
               alt="Minimal Desk Setup"
+              loading="lazy"
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
             <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white">
               <div>
                 <h4 className="text-xs font-bold leading-tight">Minimal Desk</h4>
-                <span className="text-[10px] text-slate-300">87 Ideas</span>
+                <span className="text-[10px] text-slate-300">Oak & Walnut</span>
               </div>
               <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
                 <ArrowRight className="w-3 h-3" />
@@ -593,7 +629,7 @@ const Products = () => {
             </div>
           </div>
 
-          {/* Newsletter Card */}
+          {/* Newsletter Card with Working Subscription Form */}
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 flex flex-col justify-center shadow-sm">
             <h3 className="text-lg font-black text-slate-900">
               Get the Latest Tech & Deals
@@ -601,16 +637,29 @@ const Products = () => {
             <p className="text-xs text-slate-500 mt-1 mb-4">
               Join our newsletter community and never miss a product drop or limited-time sale.
             </p>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                className="w-full px-4 py-2.5 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-              <button className="px-5 py-2.5 rounded-full bg-slate-900 hover:bg-red-600 text-white text-xs font-bold transition-colors whitespace-nowrap">
-                Subscribe
-              </button>
-            </div>
+
+            {newsletterSuccess ? (
+              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-2xl flex items-center gap-2">
+                <span>✓ Thank you for subscribing! Check your inbox for your 15% VIP welcome code.</span>
+              </div>
+            ) : (
+              <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
+                <input
+                  type="email"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  placeholder="Enter your email address"
+                  required
+                  className="w-full px-4 py-2.5 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-full bg-slate-900 hover:bg-red-600 text-white text-xs font-bold transition-colors whitespace-nowrap cursor-pointer"
+                >
+                  Subscribe
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </section>
