@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { getProductById } from "../services/api";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import { useWishlist } from "../context/WishlistContext";
 import {
   ArrowLeft,
   Tag,
@@ -14,6 +15,7 @@ import {
   RotateCcw,
   RefreshCw,
   Loader2,
+  Heart,
 } from "lucide-react";
 
 const ProductDetails = () => {
@@ -21,13 +23,37 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { addToCart, cartItems } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [adding, setAdding] = useState(false);
   const [addedNotice, setAddedNotice] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [wishlistNotice, setWishlistNotice] = useState("");
   const [cartError, setCartError] = useState(null);
+
+  const isWishlisted = Boolean(product && isInWishlist(product._id));
+
+  const handleWishlistToggle = async () => {
+    if (!product || wishlistLoading) return;
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    setWishlistLoading(true);
+    try {
+      const res = await toggleWishlist(product._id);
+      setWishlistNotice(res.isWishlisted ? "Saved to Wishlist ♥" : "Removed from Wishlist");
+      setTimeout(() => setWishlistNotice(""), 3000);
+    } catch (err) {
+      setCartError(err.message || "Failed to update wishlist");
+      setTimeout(() => setCartError(null), 3000);
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -212,45 +238,72 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* Add to Cart Section (Lab 05) */}
-          <div className="pt-4">
+          {/* Actions Section: Add to Cart + Add to Wishlist */}
+          <div className="pt-4 space-y-3">
             {addedNotice && (
-              <div className="mb-3 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+              <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                 <span>Added to your cart successfully!</span>
               </div>
             )}
 
+            {wishlistNotice && (
+              <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-xs font-semibold flex items-center gap-2 animate-in">
+                <Heart className="w-4 h-4 fill-red-500 text-red-500 flex-shrink-0" />
+                <span>{wishlistNotice}</span>
+              </div>
+            )}
+
             {cartError && (
-              <div className="mb-3 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
+              <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
                 <span>{cartError}</span>
               </div>
             )}
 
-            <button
-              onClick={handleAddToCart}
-              disabled={isOutOfStock || adding}
-              className="w-full py-4 px-6 rounded-full bg-red-600 hover:bg-red-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-red-600/30 transition-all cursor-pointer"
-            >
-              {adding ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Adding to Cart...</span>
-                </>
-              ) : (
-                <>
-                  <ShoppingCart className="w-5 h-5" />
-                  <span>
-                    {isOutOfStock
-                      ? "Sold Out"
-                      : cartItems.some((item) => (item.product?._id || item.product) === product?._id)
-                      ? `Add Another (${cartItems.find((item) => (item.product?._id || item.product) === product?._id)?.quantity} in cart)`
-                      : "Add to Cart"}
-                  </span>
-                </>
-              )}
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={handleAddToCart}
+                disabled={isOutOfStock || adding}
+                className="flex-1 py-4 px-6 rounded-full bg-red-600 hover:bg-red-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-red-600/30 transition-all cursor-pointer"
+              >
+                {adding ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Adding to Cart...</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="w-5 h-5" />
+                    <span>
+                      {isOutOfStock
+                        ? "Sold Out"
+                        : cartItems.some((item) => (item.product?._id || item.product) === product?._id)
+                        ? `Add Another (${cartItems.find((item) => (item.product?._id || item.product) === product?._id)?.quantity} in cart)`
+                        : "Add to Cart"}
+                    </span>
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={handleWishlistToggle}
+                disabled={wishlistLoading}
+                className={`py-4 px-6 rounded-full border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                  isWishlisted
+                    ? "bg-red-50 border-red-200 text-red-600 hover:bg-red-100 shadow-sm"
+                    : "bg-white border-slate-200 text-slate-700 hover:border-red-300 hover:text-red-600 hover:bg-red-50/50"
+                } ${wishlistLoading ? "opacity-70 cursor-wait" : ""}`}
+                title={isWishlisted ? "Remove from Wishlist" : "Save to Wishlist"}
+              >
+                {wishlistLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-red-600" />
+                ) : (
+                  <Heart className={`w-4 h-4 transition-all ${isWishlisted ? "fill-red-500 text-red-500 scale-110" : "text-slate-400"}`} />
+                )}
+                <span>{isWishlisted ? "Saved to Wishlist" : "Save to Wishlist"}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

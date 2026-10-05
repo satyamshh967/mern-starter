@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { getWishlist, removeFromWishlist } from "../services/api";
+import { useWishlist } from "../context/WishlistContext";
 import {
   Heart,
   Trash2,
@@ -15,49 +15,23 @@ import {
 
 const Wishlist = () => {
   const { user, loading: authLoading } = useAuth();
-  const [wishlistItems, setWishlistItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const {
+    wishlist: wishlistItems,
+    loading,
+    error,
+    removeFromWishlist,
+    refreshWishlist,
+  } = useWishlist();
   const [removingId, setRemovingId] = useState(null);
-
-  const fetchWishlist = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getWishlist();
-      setWishlistItems(data.wishlist || []);
-    } catch (err) {
-      if (err.response?.status === 401) {
-        setError("Please log in to view your wishlist.");
-      } else {
-        setError(
-          err.response?.data?.message ||
-            "Something went wrong while loading your wishlist."
-        );
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchWishlist();
-    } else if (!authLoading && !user) {
-      setLoading(false);
-      setError("Please log in to view your wishlist.");
-    }
-  }, [authLoading, user]);
 
   const handleRemove = async (productId) => {
     setRemovingId(productId);
     try {
       await removeFromWishlist(productId);
-      setWishlistItems((prev) => prev.filter((item) => item._id !== productId));
     } catch (err) {
       console.error(
         "Remove from wishlist failed:",
-        err.response?.data?.message || err.message
+        err.message
       );
     } finally {
       setRemovingId(null);
@@ -147,7 +121,7 @@ const Wishlist = () => {
             </p>
             {user ? (
               <button
-                onClick={fetchWishlist}
+                onClick={refreshWishlist}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors cursor-pointer"
               >
                 <RefreshCw className="w-3.5 h-3.5" />

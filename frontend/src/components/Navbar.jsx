@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
-import { getWishlist } from "../services/api";
+import { useWishlist } from "../context/WishlistContext";
 import {
   ShoppingBag,
   User,
@@ -19,32 +19,15 @@ import {
 const Navbar = () => {
   const { user, logout } = useAuth();
   const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
   const navigate = useNavigate();
   const location = useLocation();
-  const [wishlistCount, setWishlistCount] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Close mobile menu whenever route changes
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
-
-  // Fetch wishlist count when user is logged in or location changes
-  useEffect(() => {
-    const fetchCount = async () => {
-      if (!user) {
-        setWishlistCount(0);
-        return;
-      }
-      try {
-        const data = await getWishlist();
-        setWishlistCount((data.wishlist || []).length);
-      } catch {
-        setWishlistCount(0);
-      }
-    };
-    fetchCount();
-  }, [user, location.pathname]);
 
   const handleLogout = async () => {
     await logout();

@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Customer = require("../models/customer.model");
 const Product = require("../models/product.model");
 
+// POST /wishlist/:productId — Add product to wishlist
 exports.addToWishlist = async (req, res) => {
   try {
     const { productId } = req.params;
@@ -17,7 +18,11 @@ exports.addToWishlist = async (req, res) => {
     }
 
     const customer = await Customer.findById(customerId);
-    if (customer.wishlist.includes(productId)) {
+    const isAlreadyWishlisted = customer.wishlist.some(
+      (id) => id.toString() === productId
+    );
+
+    if (isAlreadyWishlisted) {
       return res.status(409).json({ success: false, message: "Product already in wishlist" });
     }
 
@@ -34,6 +39,7 @@ exports.addToWishlist = async (req, res) => {
   }
 };
 
+// GET /wishlist — Retrieve populated wishlist
 exports.getWishlist = async (req, res) => {
   try {
     const customerId = req.user._id;
@@ -41,13 +47,14 @@ exports.getWishlist = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      wishlist: customer.wishlist,
+      wishlist: customer.wishlist || [],
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: "Server Error", error: error.message });
   }
 };
 
+// DELETE /wishlist/:productId — Remove product from wishlist
 exports.removeFromWishlist = async (req, res) => {
   try {
     const { productId } = req.params;
@@ -58,12 +65,15 @@ exports.removeFromWishlist = async (req, res) => {
     }
 
     const customer = await Customer.findById(customerId);
-    
-    if (!customer.wishlist.includes(productId)) {
+    const itemIndex = customer.wishlist.findIndex(
+      (id) => id.toString() === productId
+    );
+
+    if (itemIndex === -1) {
       return res.status(404).json({ success: false, message: "Product not found in wishlist" });
     }
 
-    customer.wishlist.pull(productId);
+    customer.wishlist.splice(itemIndex, 1);
     await customer.save();
 
     return res.status(200).json({
@@ -76,6 +86,7 @@ exports.removeFromWishlist = async (req, res) => {
   }
 };
 
+// PATCH /wishlist/:productId/toggle — Toggle product in/out of wishlist
 exports.toggleWishlist = async (req, res) => {
   try {
     const { productId } = req.params;
@@ -91,17 +102,19 @@ exports.toggleWishlist = async (req, res) => {
     }
 
     const customer = await Customer.findById(customerId);
-    const index = customer.wishlist.indexOf(productId);
-    
+    const itemIndex = customer.wishlist.findIndex(
+      (id) => id.toString() === productId
+    );
+
     let action = "";
-    if (index > -1) {
-      customer.wishlist.pull(productId);
+    if (itemIndex > -1) {
+      customer.wishlist.splice(itemIndex, 1);
       action = "removed";
     } else {
       customer.wishlist.push(productId);
       action = "added";
     }
-    
+
     await customer.save();
 
     return res.status(200).json({

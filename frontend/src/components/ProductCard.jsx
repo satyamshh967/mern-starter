@@ -8,16 +8,17 @@ import {
   Loader2,
   ShoppingCart,
 } from "lucide-react";
-import { toggleWishlist } from "../services/api";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import { useWishlist } from "../context/WishlistContext";
 
-const ProductCard = ({ product, isInWishlist = false, onWishlistChange }) => {
+const ProductCard = ({ product, onWishlistChange }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { cartItems, addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
 
-  const [wishlisted, setWishlisted] = useState(isInWishlist);
+  const isWishlisted = isInWishlist(product._id);
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const [cartError, setCartError] = useState(null);
@@ -46,19 +47,12 @@ const ProductCard = ({ product, isInWishlist = false, onWishlistChange }) => {
 
     setWishlistLoading(true);
     try {
-      const data = await toggleWishlist(product._id);
-      const nowWishlisted = data.action === "added";
-      setWishlisted(nowWishlisted);
+      const res = await toggleWishlist(product._id);
       if (onWishlistChange) {
-        onWishlistChange(product._id, nowWishlisted);
+        onWishlistChange(product._id, res.isWishlisted);
       }
     } catch (err) {
-      if (err.response?.status !== 401) {
-        console.error(
-          "Wishlist toggle failed:",
-          err.response?.data?.message || err.message
-        );
-      }
+      console.error("Wishlist toggle error:", err.message);
     } finally {
       setWishlistLoading(false);
     }
@@ -112,18 +106,19 @@ const ProductCard = ({ product, isInWishlist = false, onWishlistChange }) => {
           onClick={handleWishlistToggle}
           disabled={wishlistLoading}
           className={`absolute top-3 right-3 w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center shadow-sm border transition-all duration-200 ${
-            wishlisted
-              ? "bg-red-50 border-red-200 text-red-500"
-              : "bg-white/90 border-slate-100 text-slate-400 hover:text-red-500"
+            isWishlisted
+              ? "bg-red-50 border-red-200 text-red-500 shadow-red-500/20 shadow-md"
+              : "bg-white/90 border-slate-100 text-slate-400 hover:text-red-500 hover:scale-110"
           } ${wishlistLoading ? "opacity-70 cursor-wait" : "cursor-pointer"}`}
-          title={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
           {wishlistLoading ? (
             <Loader2 className="w-4 h-4 animate-spin text-red-500" />
           ) : (
             <Heart
               className={`w-4 h-4 transition-all duration-200 ${
-                wishlisted ? "fill-red-500 text-red-500 scale-110" : ""
+                isWishlisted ? "fill-red-500 text-red-500 scale-110" : ""
               }`}
             />
           )}
