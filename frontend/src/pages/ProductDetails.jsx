@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { getProductById } from "../services/api";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import {
   ArrowLeft,
   Tag,
@@ -11,14 +13,21 @@ import {
   Shield,
   RotateCcw,
   RefreshCw,
+  Loader2,
 } from "lucide-react";
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { addToCart, cartItems } = useCart();
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [adding, setAdding] = useState(false);
   const [addedNotice, setAddedNotice] = useState(false);
+  const [cartError, setCartError] = useState(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -42,10 +51,24 @@ const ProductDetails = () => {
     }
   }, [id]);
 
-  const handleAddToCart = () => {
-    // UI-only for now per Lab 03 Task 8
-    setAddedNotice(true);
-    setTimeout(() => setAddedNotice(false), 2500);
+  const handleAddToCart = async () => {
+    if (isOutOfStock || adding) return;
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    setAdding(true);
+    setCartError(null);
+    try {
+      await addToCart(product._id);
+      setAddedNotice(true);
+      setTimeout(() => setAddedNotice(false), 3000);
+    } catch (err) {
+      setCartError(err.message || "Failed to add to cart");
+      setTimeout(() => setCartError(null), 3500);
+    } finally {
+      setAdding(false);
+    }
   };
 
   if (loading) {
@@ -189,24 +212,44 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* Add to Cart Section (UI only for Lab 03) */}
+          {/* Add to Cart Section (Lab 05) */}
           <div className="pt-4">
             {addedNotice && (
-              <div className="mb-3 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Added to cart! (Cart functionality arrives in Lab 04)</span>
+              <div className="mb-3 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <span>Added to your cart successfully!</span>
+              </div>
+            )}
+
+            {cartError && (
+              <div className="mb-3 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+                <span>{cartError}</span>
               </div>
             )}
 
             <button
               onClick={handleAddToCart}
-              disabled={isOutOfStock}
+              disabled={isOutOfStock || adding}
               className="w-full py-4 px-6 rounded-full bg-red-600 hover:bg-red-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-red-600/30 transition-all cursor-pointer"
             >
-              <ShoppingCart className="w-5 h-5" />
-              <span>
-                {isOutOfStock ? "Sold Out" : "Add to Cart"}
-              </span>
+              {adding ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Adding to Cart...</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingCart className="w-5 h-5" />
+                  <span>
+                    {isOutOfStock
+                      ? "Sold Out"
+                      : cartItems.some((item) => (item.product?._id || item.product) === product?._id)
+                      ? `Add Another (${cartItems.find((item) => (item.product?._id || item.product) === product?._id)?.quantity} in cart)`
+                      : "Add to Cart"}
+                  </span>
+                </>
+              )}
             </button>
           </div>
         </div>

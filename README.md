@@ -1,6 +1,6 @@
 # ShopKart — Fullstack E-Commerce Platform
 
-A modern, fullstack e-commerce web application featuring secure customer authentication with JWT and HttpOnly cookies, responsive product catalog discovery, category filtering, search, detailed product views, and a persistent wishlist experience.
+A modern, fullstack e-commerce web application featuring secure customer authentication with JWT and HttpOnly cookies, responsive product catalog discovery, category filtering, search, detailed product views, a persistent wishlist experience, and a reactive global shopping cart.
 
 ---
 
@@ -23,13 +23,21 @@ A modern, fullstack e-commerce web application featuring secure customer authent
 - **State Handling**: Polished skeleton loading states, informative error states with retry actions, and empty states.
 
 ### ♥️ Wishlist
-- **Persistent Wishlist**: Backend-driven wishlist stored as ObjectId references in the Customer model — not frontend state.
+- **Persistent Wishlist**: Backend-driven wishlist stored as ObjectId references in the Customer model.
 - **Toggle Heart Button**: One-click ♡/♥ toggle on every product card with loading spinner feedback.
 - **Dedicated Wishlist Page**: Full `/wishlist` page with loading skeleton, empty state CTA, error handling, and remove button.
 - **Navbar Badge**: Live wishlist count badge in the navigation bar, refreshed on every route change.
 - **Duplicate Prevention**: Backend returns 409 Conflict if the same product is added twice.
-- **Edge Case Handling**: Invalid product ID (400), product not found (404), unauthenticated (401), not in wishlist (404).
 - **Bonus Toggle Endpoint**: `PATCH /wishlist/:productId/toggle` — adds if absent, removes if present.
+
+### 🛍️ Shopping Cart
+- **Persistent Backend Cart**: Quantity-aware cart stored in MongoDB referencing the Product collection.
+- **Global Cart State**: Real-time state synchronisation via React Context API (`CartContext`), keeping the Cart page, Navbar badge, and Product cards in perfect sync.
+- **Duplicate Prevention & Auto-Increment**: Adding an existing cart item increments its quantity rather than creating duplicate rows.
+- **Strict Stock Validation**: Validates available stock for both initial addition and quantity adjustments (rejects with 400 Bad Request if requested quantity exceeds stock).
+- **Reactive Quantity Controls**: Intuitive `[-] quantity [+]` stepper controls with item-level loading indicators.
+- **Derived Order Metrics**: Real-time calculation of subtotal, total units, and item counts without saving stale redundant data in the database.
+- **Full State Coverage**: Comprehensive treatment for loading skeletons, empty cart state with CTA, and actionable error states.
 
 ---
 
@@ -40,12 +48,13 @@ A modern, fullstack e-commerce web application featuring secure customer authent
 - **Framework**: Express.js
 - **Database**: MongoDB with Mongoose ODM
 - **Security & Tokens**: bcrypt, jsonwebtoken, cookie-parser, cors, dotenv
-- **Testing**: Jest, Supertest
+- **Testing**: Jest, Supertest (59 automated tests)
 
 ### Frontend
 - **Framework**: React 18
 - **Build Tool**: Vite
 - **Routing**: React Router DOM (v6)
+- **State Management**: React Context API (`AuthContext`, `CartContext`)
 - **HTTP Client**: Axios (configured with `withCredentials: true`)
 - **Styling**: Tailwind CSS
 - **Icons**: Lucide React
@@ -62,23 +71,26 @@ Mern/
 │   ├── controllers/
 │   │   ├── customer.controller.js  # Customer registration, login, profile, logout
 │   │   ├── product.controller.js   # Product creation, listing, search, filtering
-│   │   └── wishlist.controller.js  # Wishlist add, get, remove, toggle
+│   │   ├── wishlist.controller.js  # Wishlist add, get, remove, toggle
+│   │   └── cart.controller.js      # Cart add, get, update quantity, remove
 │   ├── models/
-│   │   ├── customer.model.js       # Customer schema (includes wishlist refs)
+│   │   ├── customer.model.js       # Customer schema (includes wishlist & cart refs)
 │   │   └── product.model.js        # Product schema & validations
 │   ├── routes/
 │   │   ├── customer.routes.js      # /customers endpoints
 │   │   ├── product.routes.js       # /products endpoints
-│   │   └── wishlist.routes.js      # /wishlist endpoints (all protected)
+│   │   ├── wishlist.routes.js      # /wishlist endpoints (protected)
+│   │   └── cart.routes.js          # /cart endpoints (protected)
 │   ├── middlewares/
 │   │   └── auth.middleware.js      # JWT cookie verification middleware
 │   ├── utils/
 │   │   ├── generateToken.js        # Signs JWT tokens
 │   │   └── seedProducts.js         # Mock product seeder
 │   ├── tests/
-│   │   ├── customer.test.js        # Authentication test suite
-│   │   ├── product.test.js         # Product API test suite
-│   │   └── wishlist.test.js        # Wishlist API test suite
+│   │   ├── customer.test.js        # Authentication test suite (15 tests)
+│   │   ├── product.test.js         # Product API test suite (10 tests)
+│   │   ├── wishlist.test.js        # Wishlist API test suite (14 tests)
+│   │   └── cart.test.js            # Cart API test suite (20 tests)
 │   ├── index.js                    # Express app entrypoint & MongoDB connection
 │   ├── package.json
 │   └── .env
@@ -86,20 +98,22 @@ Mern/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Navbar.jsx          # Top navigation, user session badge & wishlist count
-│   │   │   ├── ProductCard.jsx     # Product card with wishlist toggle button
+│   │   │   ├── Navbar.jsx          # Top navigation, user session, wishlist & cart badges
+│   │   │   ├── ProductCard.jsx     # Product card with wishlist & cart integration
 │   │   │   └── SearchBar.jsx       # Search input, category dropdown & sort selector
 │   │   ├── pages/
 │   │   │   ├── Register.jsx        # Account registration page
 │   │   │   ├── Login.jsx           # User login page
 │   │   │   ├── Home.jsx            # Protected customer dashboard
 │   │   │   ├── Products.jsx        # Product discovery catalog
-│   │   │   ├── ProductDetails.jsx  # Single product details view
-│   │   │   └── Wishlist.jsx        # Wishlist page with remove & empty states
+│   │   │   ├── ProductDetails.jsx  # Single product details view & Add to Cart
+│   │   │   ├── Wishlist.jsx        # Wishlist page with remove & empty states
+│   │   │   └── Cart.jsx            # Cart page with stepper controls & order summary
 │   │   ├── services/
 │   │   │   └── api.js              # Centralized Axios API client
 │   │   ├── context/
-│   │   │   └── AuthContext.jsx     # React context for global auth state
+│   │   │   ├── AuthContext.jsx     # React context for global auth state
+│   │   │   └── CartContext.jsx     # Global cart state & derived totals
 │   │   ├── App.jsx                 # Route configurations
 │   │   ├── index.css               # Tailwind directives
 │   │   └── main.jsx
@@ -178,24 +192,6 @@ Visit [http://localhost:5173](http://localhost:5173) in your browser.
 | `POST` | `/customers/logout` | Clear authentication cookie and end session | **Yes** |
 | `PATCH` | `/customers/change-password` | Update account password (`oldPassword`, `newPassword`) | **Yes** |
 
-#### Sample Register Request
-```json
-{
-  "fullName": "Jane Doe",
-  "email": "jane@example.com",
-  "password": "securepassword123",
-  "phone": "9876543210"
-}
-```
-
-#### Sample Login Request
-```json
-{
-  "email": "jane@example.com",
-  "password": "securepassword123"
-}
-```
-
 ---
 
 ### Product Catalog (`/products`)
@@ -205,18 +201,6 @@ Visit [http://localhost:5173](http://localhost:5173) in your browser.
 | `POST` | `/products` | Create a new product | — |
 | `GET` | `/products` | Retrieve catalog with optional search & filters | `search`, `category`, `sort=price_asc\|price_desc` |
 | `GET` | `/products/:id` | Retrieve single product by MongoDB ID | — |
-
-#### Sample Create Product Request
-```json
-{
-  "name": "Mechanical Keyboard",
-  "description": "RGB backlit mechanical keyboard with blue switches.",
-  "price": 2999,
-  "category": "Electronics",
-  "image": "https://example.com/keyboard.jpg",
-  "stock": 10
-}
-```
 
 ---
 
@@ -231,6 +215,17 @@ Visit [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
+### Shopping Cart (`/cart`) — All Protected
+
+| Method | Endpoint | Description | Status Codes |
+|---|---|---|---|
+| `POST` | `/cart/:productId` | Add product to cart (or increment quantity) | 200, 400, 404 |
+| `GET` | `/cart` | Retrieve user's cart populated with product details | 200 |
+| `PATCH` | `/cart/:productId` | Update item quantity (`{ quantity }`) | 200, 400, 404 |
+| `DELETE` | `/cart/:productId` | Remove item from cart | 200, 400, 404 |
+
+---
+
 ## 🧪 Testing
 
 The backend includes a comprehensive Jest and Supertest suite:
@@ -240,4 +235,4 @@ cd backend
 npm test
 ```
 
-All 39 test cases run against a local test database and validate registration, bcrypt hashing, cookie generation, route protection, search, filtering, wishlist CRUD operations, duplicate prevention, and error handling.
+All 59 test cases run against a local test database and validate registration, password hashing, cookies, route protection, search, filtering, wishlist CRUD, and full cart business logic with stock limit checks.

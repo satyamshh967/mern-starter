@@ -27,6 +27,20 @@ const customerSchema = new mongoose.Schema({
     default: Date.now,
   },
   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+  cart: [
+    {
+      product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+        required: true,
+      },
+      quantity: {
+        type: Number,
+        default: 1,
+        min: [1, "Quantity cannot be less than 1"],
+      },
+    },
+  ],
 });
 
 module.exports = mongoose.model("Customer", customerSchema);

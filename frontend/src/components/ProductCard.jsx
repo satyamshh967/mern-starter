@@ -1,12 +1,35 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowRight, Heart, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  Heart,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  ShoppingCart,
+} from "lucide-react";
 import { toggleWishlist } from "../services/api";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 const ProductCard = ({ product, isInWishlist = false, onWishlistChange }) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { cartItems, addToCart } = useCart();
+
   const [wishlisted, setWishlisted] = useState(isInWishlist);
   const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [cartError, setCartError] = useState(null);
+
   const isOutOfStock = product.stock <= 0;
+
+  // Check if item is already in cart
+  const cartItem = cartItems.find(
+    (item) => (item.product?._id || item.product) === product._id
+  );
+  const isInCart = Boolean(cartItem);
+  const currentCartQty = cartItem ? cartItem.quantity : 0;
 
   // Generate deterministic realistic like counts based on id
   const likes = Math.floor(1200 + (product.price % 800) * 1.5);
@@ -15,6 +38,11 @@ const ProductCard = ({ product, isInWishlist = false, onWishlistChange }) => {
     e.preventDefault();
     e.stopPropagation();
     if (wishlistLoading) return;
+
+    if (!user) {
+      navigate("/login");
+      return;
+    }
 
     setWishlistLoading(true);
     try {
@@ -25,12 +53,36 @@ const ProductCard = ({ product, isInWishlist = false, onWishlistChange }) => {
         onWishlistChange(product._id, nowWishlisted);
       }
     } catch (err) {
-      // If 401, user not logged in — silently ignore
       if (err.response?.status !== 401) {
-        console.error("Wishlist toggle failed:", err.response?.data?.message || err.message);
+        console.error(
+          "Wishlist toggle failed:",
+          err.response?.data?.message || err.message
+        );
       }
     } finally {
       setWishlistLoading(false);
+    }
+  };
+
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isOutOfStock || addingToCart) return;
+
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    setAddingToCart(true);
+    setCartError(null);
+    try {
+      await addToCart(product._id);
+    } catch (err) {
+      setCartError(err.message || "Failed to add to cart");
+      setTimeout(() => setCartError(null), 3000);
+    } finally {
+      setAddingToCart(false);
     }
   };
 
@@ -121,14 +173,50 @@ const ProductCard = ({ product, isInWishlist = false, onWishlistChange }) => {
           <span className="text-slate-400">Ships in 24h</span>
         </div>
 
-        {/* View Details Action Button */}
-        <Link
-          to={`/products/${product._id}`}
-          className="mt-3.5 w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-red-600 text-white text-xs font-bold flex items-center justify-center gap-2 transition-colors duration-200"
-        >
-          <span>View Details</span>
-          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
+        {/* Inline error feedback if stock limit hit */}
+        {cartError && (
+          <p className="mt-2 text-[11px] font-medium text-rose-600 bg-rose-50 px-2 py-1 rounded-lg">
+            {cartError}
+          </p>
+        )}
+
+        {/* Actions Row: Add to Cart + View Details */}
+        <div className="mt-3.5 flex gap-2">
+          <button
+            onClick={handleAddToCart}
+            disabled={isOutOfStock || addingToCart}
+            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+              isInCart
+                ? "bg-red-50 hover:bg-red-100 text-red-700 border border-red-200"
+                : "bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-600/20"
+            }`}
+          >
+            {addingToCart ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Adding...</span>
+              </>
+            ) : isInCart ? (
+              <>
+                <ShoppingCart className="w-3.5 h-3.5 text-red-600" />
+                <span>Add Another ({currentCartQty})</span>
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="w-3.5 h-3.5" />
+                <span>{isOutOfStock ? "Out of Stock" : "Add to Cart"}</span>
+              </>
+            )}
+          </button>
+
+          <Link
+            to={`/products/${product._id}`}
+            className="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center transition-colors"
+            title="View Details"
+          >
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -76,4 +76,25 @@ export const getWishlistCount = async () => {
   return (response.data.wishlist || []).length;
 };
 
+// Cart APIs (Lab 05)
+export const getCart = async () => {
+  const response = await API.get("/cart");
+  return response.data;
+};
+
+export const addToCart = async (productId) => {
+  const response = await API.post(`/cart/${productId}`);
+  return response.data;
+};
+
+export const updateCartQuantity = async (productId, quantity) => {
+  const response = await API.patch(`/cart/${productId}`, { quantity });
+  return response.data;
+};
+
+export const removeFromCart = async (productId) => {
+  const response = await API.delete(`/cart/${productId}`);
+  return response.data;
+};
+
 export default API;
