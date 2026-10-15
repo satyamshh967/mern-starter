@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const app = require("../index");
 const Customer = require("../models/customer.model");
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/shopkart_test";
+const MONGO_URI = process.env.TEST_MONGO_URI || "mongodb://127.0.0.1:27017/shopkart_test";
 
 beforeAll(async () => {
   if (mongoose.connection.readyState === 0) {

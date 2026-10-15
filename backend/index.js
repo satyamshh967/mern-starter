@@ -44,8 +44,22 @@ app.get("/", (req, res) => {
 if (process.env.NODE_ENV !== "test") {
   mongoose
     .connect(MONGO_URI)
-    .then(() => {
+    .then(async () => {
       console.log(`Connected to MongoDB successfully at ${MONGO_URI}`);
+
+      // Auto-seed pre-added products if catalogue is empty
+      try {
+        const Product = require("./models/product.model");
+        const defaultProducts = require("./utils/defaultProducts");
+        const count = await Product.countDocuments();
+        if (count === 0) {
+          await Product.insertMany(defaultProducts);
+          console.log(`Auto-seeded catalogue with ${defaultProducts.length} pre-added products.`);
+        }
+      } catch (seedErr) {
+        console.error("Auto-seed error:", seedErr.message);
+      }
+
       app.listen(PORT, () => {
         console.log(`ShopKart Backend Server running on http://localhost:${PORT}`);
       });

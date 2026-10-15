@@ -6,7 +6,7 @@ const Customer = require("../models/customer.model");
 const Product = require("../models/product.model");
 const Order = require("../models/order.model");
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/shopkart_test";
+const MONGO_URI = process.env.TEST_MONGO_URI || "mongodb://127.0.0.1:27017/shopkart_test";
 
 let authCookie;
 let otherUserCookie;
