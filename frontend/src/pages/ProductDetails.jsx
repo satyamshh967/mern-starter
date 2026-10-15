@@ -4,6 +4,7 @@ import { getProductById } from "../services/api";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useWishlist } from "../context/WishlistContext";
+import { useToast } from "../context/ToastContext";
 import {
   ArrowLeft,
   Tag,
@@ -24,6 +25,7 @@ const ProductDetails = () => {
   const { user } = useAuth();
   const { addToCart, cartItems } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const { showToast } = useToast();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,9 +48,18 @@ const ProductDetails = () => {
     try {
       const res = await toggleWishlist(product._id);
       setWishlistNotice(res.isWishlisted ? "Saved to Wishlist ♥" : "Removed from Wishlist");
+      showToast({
+        message: res.isWishlisted
+          ? `Saved "${product.name}" to wishlist!`
+          : `Removed "${product.name}" from wishlist`,
+        type: "success",
+        actionText: res.isWishlisted ? "View Wishlist" : null,
+        actionLink: res.isWishlisted ? "/wishlist" : null,
+      });
       setTimeout(() => setWishlistNotice(""), 3000);
     } catch (err) {
       setCartError(err.message || "Failed to update wishlist");
+      showToast({ message: err.message, type: "error" });
       setTimeout(() => setCartError(null), 3000);
     } finally {
       setWishlistLoading(false);
@@ -88,9 +99,16 @@ const ProductDetails = () => {
     try {
       await addToCart(product._id);
       setAddedNotice(true);
+      showToast({
+        message: `Added "${product.name}" to cart!`,
+        type: "success",
+        actionText: "View Cart",
+        actionLink: "/cart",
+      });
       setTimeout(() => setAddedNotice(false), 3000);
     } catch (err) {
       setCartError(err.message || "Failed to add to cart");
+      showToast({ message: err.message || "Failed to add to cart", type: "error" });
       setTimeout(() => setCartError(null), 3500);
     } finally {
       setAdding(false);
@@ -101,7 +119,7 @@ const ProductDetails = () => {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <RefreshCw className="w-8 h-8 animate-spin text-blue-600" />
+          <RefreshCw className="w-8 h-8 animate-spin text-red-600" />
           <p className="text-sm font-medium text-slate-500">
             Loading product details...
           </p>

@@ -12,6 +12,7 @@ import {
   Sparkles,
   Heart,
   ShoppingCart,
+  Package,
   Menu,
   X,
 } from "lucide-react";
@@ -34,6 +35,13 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  const isActive = (path) => {
+    if (path === "/products") {
+      return location.pathname === "/products" || location.pathname.startsWith("/products/");
+    }
+    return location.pathname === path;
+  };
+
   return (
     <header className="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-sm backdrop-blur-md bg-white/95">
       {/* Top micro-announcement bar */}
@@ -50,7 +58,7 @@ const Navbar = () => {
             className="flex items-center gap-2.5 group cursor-pointer"
             title="ShopKart Home"
           >
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-500 flex items-center justify-center text-white shadow-md shadow-red-500/25 group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-500 flex items-center justify-center text-white shadow-md shadow-red-500/25 group-hover:scale-105 group-hover:rotate-3 transition-all duration-300">
               <ShoppingBag className="w-5 h-5" />
             </div>
             <div className="flex flex-col">
@@ -58,7 +66,7 @@ const Navbar = () => {
                 <span className="text-xl font-black tracking-tight text-slate-900">
                   ShopKart
                 </span>
-                <span className="w-2 h-2 rounded-full bg-red-600 ml-1 mt-1"></span>
+                <span className="w-2 h-2 rounded-full bg-red-600 ml-1 mt-1 animate-pulse"></span>
               </div>
               <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold -mt-1">
                 Tech & Gadgets
@@ -67,10 +75,14 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-3 lg:gap-4">
+          <div className="hidden md:flex items-center gap-2 lg:gap-3">
             <Link
               to="/products"
-              className="px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-red-600 hover:bg-red-50/50 rounded-xl transition-colors flex items-center gap-1.5"
+              className={`px-3.5 py-2 text-xs rounded-xl transition-all duration-200 flex items-center gap-1.5 ${
+                isActive("/products")
+                  ? "bg-red-50 text-red-600 font-black shadow-sm"
+                  : "font-bold text-slate-700 hover:text-red-600 hover:bg-slate-50"
+              }`}
             >
               <Sparkles className="w-3.5 h-3.5 text-red-600" />
               <span>Browse Catalog</span>
@@ -81,12 +93,22 @@ const Navbar = () => {
                 {/* Wishlist Link with Count Badge */}
                 <Link
                   to="/wishlist"
-                  className="relative px-3 py-2 text-xs font-bold text-slate-700 hover:text-red-600 hover:bg-red-50/50 rounded-xl transition-colors flex items-center gap-1.5"
+                  className={`relative px-3 py-2 text-xs rounded-xl transition-all duration-200 flex items-center gap-1.5 ${
+                    isActive("/wishlist")
+                      ? "bg-red-50 text-red-600 font-black shadow-sm"
+                      : "font-bold text-slate-700 hover:text-red-600 hover:bg-slate-50"
+                  }`}
                 >
-                  <Heart className={`w-3.5 h-3.5 ${wishlistCount > 0 ? "fill-red-500 text-red-500" : "text-red-600"}`} />
+                  <Heart
+                    className={`w-3.5 h-3.5 transition-transform group-hover:scale-110 ${
+                      wishlistCount > 0
+                        ? "fill-red-500 text-red-500"
+                        : "text-slate-600"
+                    }`}
+                  />
                   <span>Wishlist</span>
                   {wishlistCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center shadow-sm shadow-red-500/30 animate-in">
+                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center shadow-sm shadow-red-500/30 animate-pulse-glow">
                       {wishlistCount > 9 ? "9+" : wishlistCount}
                     </span>
                   )}
@@ -95,20 +117,44 @@ const Navbar = () => {
                 {/* Cart Link with Live Count Badge */}
                 <Link
                   to="/cart"
-                  className="relative px-3 py-2 text-xs font-bold text-slate-700 hover:text-red-600 hover:bg-red-50/50 rounded-xl transition-colors flex items-center gap-1.5"
+                  className={`relative px-3 py-2 text-xs rounded-xl transition-all duration-200 flex items-center gap-1.5 ${
+                    isActive("/cart")
+                      ? "bg-red-50 text-red-600 font-black shadow-sm"
+                      : "font-bold text-slate-700 hover:text-red-600 hover:bg-slate-50"
+                  }`}
                 >
-                  <ShoppingCart className={`w-3.5 h-3.5 ${cartCount > 0 ? "text-red-600" : "text-slate-600"}`} />
+                  <ShoppingCart
+                    className={`w-3.5 h-3.5 ${
+                      cartCount > 0 ? "text-red-600" : "text-slate-600"
+                    }`}
+                  />
                   <span>Cart</span>
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center shadow-sm shadow-red-500/30 animate-in">
+                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center shadow-sm shadow-red-500/30 animate-pulse-glow">
                       {cartCount > 9 ? "9+" : cartCount}
                     </span>
                   )}
                 </Link>
 
                 <Link
+                  to="/orders"
+                  className={`px-3 py-2 text-xs rounded-xl transition-all duration-200 flex items-center gap-1.5 ${
+                    isActive("/orders")
+                      ? "bg-red-50 text-red-600 font-black shadow-sm"
+                      : "font-bold text-slate-700 hover:text-red-600 hover:bg-slate-50"
+                  }`}
+                >
+                  <Package className="w-3.5 h-3.5 text-red-600" />
+                  <span>Orders</span>
+                </Link>
+
+                <Link
                   to="/home"
-                  className="px-3 py-2 text-xs font-bold text-slate-700 hover:text-red-600 hover:bg-slate-50 rounded-xl transition-colors flex items-center gap-2"
+                  className={`px-3 py-2 text-xs rounded-xl transition-all duration-200 flex items-center gap-2 ${
+                    isActive("/home")
+                      ? "bg-red-50 text-red-600 font-black shadow-sm"
+                      : "font-bold text-slate-700 hover:text-red-600 hover:bg-slate-50"
+                  }`}
                 >
                   <User className="w-3.5 h-3.5 text-red-600" />
                   <span>My Profile</span>
@@ -118,7 +164,7 @@ const Navbar = () => {
 
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-700 rounded-full text-xs font-bold border border-red-100">
                   <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
-                  <span>{user.fullName}</span>
+                  <span className="truncate max-w-[120px]">{user.fullName}</span>
                 </div>
 
                 <button
@@ -232,6 +278,14 @@ const Navbar = () => {
                     {cartCount}
                   </span>
                 )}
+              </Link>
+
+              <Link
+                to="/orders"
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-slate-800 hover:bg-red-50 hover:text-red-600 transition-colors"
+              >
+                <Package className="w-4 h-4 text-red-600" />
+                <span>My Orders</span>
               </Link>
 
               <Link

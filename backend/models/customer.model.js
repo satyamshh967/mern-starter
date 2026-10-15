@@ -43,4 +43,14 @@ const customerSchema = new mongoose.Schema({
   ],
 });
 
-module.exports = mongoose.model("Customer", customerSchema);
+const Customer = mongoose.models.Customer || mongoose.model("Customer", customerSchema);
+if (!mongoose.models.User) {
+  try {
+    mongoose.model("User", customerSchema);
+  } catch (e) {
+    throw new Error("Couldn't Load");
+    
+  }
+}
+
+module.exports = Customer;

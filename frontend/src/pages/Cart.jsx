@@ -82,8 +82,11 @@ const Cart = () => {
   };
 
   const handleProceedToCheckout = () => {
-    setCheckoutNotice(true);
-    setTimeout(() => setCheckoutNotice(false), 4000);
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    navigate("/checkout");
   };
 
   // Auth Loading Screen

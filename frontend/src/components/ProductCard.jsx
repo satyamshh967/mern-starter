@@ -11,12 +11,14 @@ import {
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useWishlist } from "../context/WishlistContext";
+import { useToast } from "../context/ToastContext";
 
 const ProductCard = ({ product, onWishlistChange }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { cartItems, addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const { showToast } = useToast();
 
   const isWishlisted = isInWishlist(product._id);
   const [wishlistLoading, setWishlistLoading] = useState(false);
@@ -51,8 +53,17 @@ const ProductCard = ({ product, onWishlistChange }) => {
       if (onWishlistChange) {
         onWishlistChange(product._id, res.isWishlisted);
       }
+      showToast({
+        message: res.isWishlisted
+          ? `Saved "${product.name}" to wishlist!`
+          : `Removed "${product.name}" from wishlist`,
+        type: "success",
+        actionText: res.isWishlisted ? "View Wishlist" : null,
+        actionLink: res.isWishlisted ? "/wishlist" : null,
+      });
     } catch (err) {
       console.error("Wishlist toggle error:", err.message);
+      showToast({ message: err.message, type: "error" });
     } finally {
       setWishlistLoading(false);
     }
@@ -72,8 +83,15 @@ const ProductCard = ({ product, onWishlistChange }) => {
     setCartError(null);
     try {
       await addToCart(product._id);
+      showToast({
+        message: `Added "${product.name}" to cart!`,
+        type: "success",
+        actionText: "View Cart",
+        actionLink: "/cart",
+      });
     } catch (err) {
       setCartError(err.message || "Failed to add to cart");
+      showToast({ message: err.message || "Failed to add to cart", type: "error" });
       setTimeout(() => setCartError(null), 3000);
     } finally {
       setAddingToCart(false);
@@ -81,7 +99,7 @@ const ProductCard = ({ product, onWishlistChange }) => {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 hover:border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden group">
+    <div className="bg-white rounded-3xl border border-slate-100 hover:border-slate-200/80 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group card-interactive">
       {/* Product Image Stage */}
       <div className="relative aspect-square w-full overflow-hidden bg-slate-50 flex items-center justify-center p-6">
         <img

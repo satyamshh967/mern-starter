@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="16" y1="16" x2="112" y2="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ef4444" />
+      <stop offset="50%" stop-color="#dc2626" />
+      <stop offset="100%" stop-color="#991b1b" />
+    </linearGradient>
+    <linearGradient id="bagGrad" x1="40" y1="40" x2="88" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f8fafc" />
+    </linearGradient>
+    <filter id="glow" x="0" y="0" width="128" height="128" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#dc2626" flood-opacity="0.45" />
+    </filter>
+  </defs>
+
+  <!-- Modern Rounded Squircle Container -->
+  <rect x="8" y="8" width="112" height="112" rx="32" fill="url(#bgGrad)" filter="url(#glow)" />
+
+  <!-- Inner Subtle Border -->
+  <rect x="8.5" y="8.5" width="111" height="111" rx="31.5" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.5" />
+
+  <!-- Shopping Bag Handles -->
+  <path d="M48 48 C48 37, 55 30, 64 30 C73 30, 80 37, 80 48" stroke="#ffffff" stroke-width="6" stroke-linecap="round" fill="none" />
+
+  <!-- Shopping Bag Body -->
+  <path d="M38 48 L90 48 L84 94 C83.5 97.5, 80.5 100, 77 100 L51 100 C47.5 100, 44.5 97.5, 44 94 Z" fill="url(#bagGrad)" />
+
+  <!-- Electric Tech Spark Bolt on the Bag -->
+  <path d="M66 58 L54 74 L63 74 L60 90 L74 72 L65 72 Z" fill="#dc2626" />
+</svg>

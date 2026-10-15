@@ -96,6 +96,11 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // Clear cart action (Lab 06 - after verified order placement)
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -108,6 +113,7 @@ export const CartProvider = ({ children }) => {
         addToCart,
         updateQuantity,
         removeFromCart,
+        clearCart,
         refreshCart: fetchCart,
       }}
     >

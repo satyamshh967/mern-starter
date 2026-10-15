@@ -97,4 +97,32 @@ export const removeFromCart = async (productId) => {
   return response.data;
 };
 
+// Order & Checkout APIs (Lab 06)
+export const createPaymentOrder = async (shippingAddress) => {
+  const response = await API.post("/orders/create-payment-order", {
+    shippingAddress,
+  });
+  return response.data;
+};
+
+export const verifyPayment = async (paymentData) => {
+  const response = await API.post("/orders/verify-payment", paymentData);
+  return response.data;
+};
+
+export const getMyOrders = async () => {
+  const response = await API.get("/orders");
+  return response.data;
+};
+
+export const getOrderById = async (id) => {
+  const response = await API.get(`/orders/${id}`);
+  return response.data;
+};
+
+export const updateOrderStatus = async (id, status) => {
+  const response = await API.patch(`/orders/${id}/status`, { status });
+  return response.data;
+};
+
 export default API;
