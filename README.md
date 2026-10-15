@@ -1,238 +1,363 @@
-# ShopKart — Fullstack E-Commerce Platform
+# 🛒 ShopKart — Full-Stack MERN E-Commerce Platform
 
-A modern, fullstack e-commerce web application featuring secure customer authentication with JWT and HttpOnly cookies, responsive product catalog discovery, category filtering, search, detailed product views, a persistent wishlist experience, and a reactive global shopping cart.
+> **Final Trimester Capstone Project** • Engineering Labs 01–06 Complete Implementation  
+> *A modern full-stack commerce experience connecting authentication, product catalog discovery, real-time wishlist, reactive shopping cart state, server-side business rules, Razorpay test payments, cryptographic verification, and persistent order history.*
 
 ---
 
-## 🌟 Features
+## 🏆 Project Overview
 
-### 🔐 Customer Authentication
-- **Secure Registration**: Creates customer accounts with input validation and duplicate email prevention.
-- **Bcrypt Hashing**: One-way cryptographic hashing with salted passwords stored in MongoDB.
-- **HttpOnly Cookie Authentication**: Issues signed JWT session tokens inside browser-managed, cross-site-scripting-resistant `HttpOnly` cookies (`SameSite: Lax`).
-- **Protected Profile Route**: Safeguarded endpoint (`/customers/me`) verifying JWT session validity.
-- **Secure Logout**: Invalidates the active authentication session by clearing client cookies.
-- **Password Management**: In-app capability to update passwords with current credential verification.
+ShopKart is a production-grade full-stack commerce application built from the ground up using the **MERN** stack (MongoDB, Express.js, React, Node.js) with Tailwind CSS, Vite, and Razorpay. It solves the end-to-end engineering lifecycle of an online store:
 
-### 🛒 Product Catalog & Discovery
-- **Dynamic Catalog**: Real-time product listing rendered from MongoDB.
-- **Live Search**: Instant, case-insensitive title search.
-- **Category Filtering**: Filter products across Electronics, Fashion, Books, and Home departments.
-- **Price Sorting**: Sort by ascending or descending price.
-- **Single Product View**: Detailed product page displaying high-resolution images, descriptions, live stock indicators, delivery badges, and an interactive Add-to-Cart workflow.
-- **State Handling**: Polished skeleton loading states, informative error states with retry actions, and empty states.
+```text
+Register / Login
+       ↓
+Browse Catalog (Search, Filter, Sort)
+       ↓
+Save to Wishlist (Persistent, Real-Time Sync)
+       ↓
+Add to Cart (Global State, Derived Metrics)
+       ↓
+Checkout & Shipping Validation
+       ↓
+Server Price & Stock Snapshotting
+       ↓
+Razorpay Test Payment
+       ↓
+HMAC-SHA256 Signature Verification
+       ↓
+Order Placed & Cart Cleared
+       ↓
+Order Confirmation & Order History
+```
 
-### ♥️ Wishlist
-- **Persistent Wishlist**: Backend-driven wishlist stored as ObjectId references in the Customer model.
-- **Toggle Heart Button**: One-click ♡/♥ toggle on every product card with loading spinner feedback.
-- **Dedicated Wishlist Page**: Full `/wishlist` page with loading skeleton, empty state CTA, error handling, and remove button.
-- **Navbar Badge**: Live wishlist count badge in the navigation bar, refreshed on every route change.
-- **Duplicate Prevention**: Backend returns 409 Conflict if the same product is added twice.
-- **Bonus Toggle Endpoint**: `PATCH /wishlist/:productId/toggle` — adds if absent, removes if present.
+---
 
-### 🛍️ Shopping Cart
-- **Persistent Backend Cart**: Quantity-aware cart stored in MongoDB referencing the Product collection.
-- **Global Cart State**: Real-time state synchronisation via React Context API (`CartContext`), keeping the Cart page, Navbar badge, and Product cards in perfect sync.
-- **Duplicate Prevention & Auto-Increment**: Adding an existing cart item increments its quantity rather than creating duplicate rows.
-- **Strict Stock Validation**: Validates available stock for both initial addition and quantity adjustments (rejects with 400 Bad Request if requested quantity exceeds stock).
-- **Reactive Quantity Controls**: Intuitive `[-] quantity [+]` stepper controls with item-level loading indicators.
-- **Derived Order Metrics**: Real-time calculation of subtotal, total units, and item counts without saving stale redundant data in the database.
-- **Full State Coverage**: Comprehensive treatment for loading skeletons, empty cart state with CTA, and actionable error states.
+## 📋 Labs Completed (Full Curriculum Implementation)
+
+| Lab | Module | Key Architectural Focus | Status |
+|:---:|---|---|:---:|
+| **01** | **Customer Authentication** | Salted bcrypt passwords, JWT generation, secure cookie issuance | ✅ Completed |
+| **02** | **Session Security & Profile** | HttpOnly cookie auth, `/customers/me`, password change verification | ✅ Completed |
+| **03** | **Product Catalog Discovery** | MongoDB aggregation, live regex search, category filtering, price sorting | ✅ Completed |
+| **04** | **Persistent Wishlist** | MongoDB ObjectId references, 1-click toggle, real-time cross-tab sync | ✅ Completed |
+| **05** | **Shopping Cart State** | Global React Context, derived subtotal & item counts, strict stock checks | ✅ Completed |
+| **06** | **Checkout, Orders & Razorpay** | Server-side total calculation, order snapshots, Razorpay popup, HMAC verification | ✅ Completed |
+
+---
+
+## 🌟 Core Features
+
+### 🔐 1. Authentication & Session Security (Labs 01 & 02)
+- **Secure Registration & Login**: Validated inputs, email uniqueness, sanitized phone numbers.
+- **Bcrypt Password Hashing**: Passwords are cryptographically salted and hashed before database persistence.
+- **HttpOnly Cookie Tokens**: Issues signed JWT session tokens stored exclusively inside browser-managed, XSS-immune `HttpOnly` cookies (`SameSite: Lax`).
+- **Protected Profile & Session Invalidation**: `/customers/me` checks session validity; `/customers/logout` clears client cookies immediately.
+- **Password Updates**: Secure in-app password changes requiring verification of old credentials.
+
+### 🛍️ 2. Curated Product Catalog & Discovery (Lab 03)
+- **Pre-Added Curated Items**: Pre-seeded with 30 Pinterest-aesthetic workspace gadgets, audiophile headphones, artisan mechanical keyboards, and engineering literature.
+- **Automatic Startup Seeding**: The server automatically checks and auto-seeds catalog products on startup if the database is ever empty, guaranteeing persistent availability across any browser.
+- **Live Search & Category Filters**: Case-insensitive instant search and category navigation across *Electronics*, *Home*, *Fashion*, and *Books*.
+- **Price Sorting & Details**: Ascending/descending sorting, live inventory stock badges, and detailed view pages.
+
+### ❤️ 3. Persistent Wishlist System (Lab 04)
+- **Database Reference Model**: Stored as an array of `ObjectId` references on the Customer model to ensure wishlist data always fetches the latest product price and availability upon population.
+- **Optimistic Heart Toggle**: 1-click heart toggle on product cards with loading spinner feedback.
+- **Live Navbar Badge**: Badge updates instantaneously across catalog, product details, and wishlist pages without full reloads.
+
+### 🛒 4. Reactive Shopping Cart & Global State (Lab 05)
+- **Centralized Cart State (`CartContext`)**: Single source of truth driving Navbar badges, product card buttons, cart page steppers, and checkout summaries.
+- **Duplicate Prevention & Quantity Controls**: Adding existing products increments quantity rather than creating duplicate rows.
+- **Strict Stock Validation**: Backend queries the latest product stock before allowing quantity increases, rejecting requests exceeding stock with `400 Bad Request`.
+- **Derived Metrics**: Subtotal, grand total, and unit counts are computed on the fly using `useMemo`, preventing stale redundant database state.
+
+### 💳 5. Checkout, Razorpay Payment & Orders (Lab 06)
+- **Shipping Address Validation**: Strict validation for required fields, valid 10-digit mobile numbers, and exactly 6-digit Indian PIN codes.
+- **Server-Side Total Calculation**: Backend recalculates prices directly from MongoDB, deliberately ignoring any client-sent fake totals.
+- **Order Snapshotting**: Saves immutable purchase-time snapshots of product name, price, and image to preserve historical accuracy even if catalog prices change later.
+- **Razorpay Test Integration**: Server creates orders in paise (`amount * 100`), returns signed `razorpay_order_id`, and opens the official Razorpay test checkout modal.
+- **Cryptographic Signature Verification**: Uses Node’s `crypto.createHmac("sha256", RAZORPAY_KEY_SECRET)` to verify signatures before marking orders `PAID` or clearing user carts.
+- **Delivery Progress Tracker (Bonus)**: Interactive 4-step delivery progress stepper (`PLACED` → `CONFIRMED` → `SHIPPED` → `DELIVERED`).
+
+### ✨ 6. UI Finishing Touches & Micro-Interactions
+- **Custom Vector Favicon**: High-resolution squircle SVG icon with brand gradient and tech spark bolt.
+- **Smooth Scrolling & ScrollToTop**: Automatic route scroll reset and floating smooth back-to-top button.
+- **Animated Toast Notification System**: Interactive floating action toasts for instant feedback when items are added to cart or saved to wishlist.
+- **Active Navigation Highlighting**: Highlights active routes and adds subtle pulsing glow rings to cart/wishlist count badges.
+- **Custom Sleek Scrollbar**: Rounded 7px scrollbar styled with subtle red accent transitions.
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Backend
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB with Mongoose ODM
-- **Security & Tokens**: bcrypt, jsonwebtoken, cookie-parser, cors, dotenv
-- **Testing**: Jest, Supertest (59 automated tests)
-
-### Frontend
-- **Framework**: React 18
-- **Build Tool**: Vite
-- **Routing**: React Router DOM (v6)
-- **State Management**: React Context API (`AuthContext`, `CartContext`)
-- **HTTP Client**: Axios (configured with `withCredentials: true`)
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
+| Area | Technology |
+|---|---|
+| **Frontend** | React 18, Vite, React Router DOM v6, Tailwind CSS, Lucide React Icons |
+| **Backend** | Node.js, Express.js |
+| **Database** | MongoDB with Mongoose ODM |
+| **Authentication** | JSON Web Tokens (`jsonwebtoken`), `bcrypt`, `cookie-parser` |
+| **Payment Gateway** | Razorpay Node.js SDK (Test Mode) + Razorpay Standard Checkout JS |
+| **Testing** | Jest, Supertest (**71/71 Automated Tests Passing**) |
 
 ---
 
-## 📁 Project Architecture
-
-Follows a clean Model-View-Controller (MVC) structure:
+## 📁 Project Structure
 
 ```text
 Mern/
 ├── backend/
+│   ├── config/
+│   │   └── razorpay.js             # Razorpay SDK initialization
 │   ├── controllers/
-│   │   ├── customer.controller.js  # Customer registration, login, profile, logout
-│   │   ├── product.controller.js   # Product creation, listing, search, filtering
-│   │   ├── wishlist.controller.js  # Wishlist add, get, remove, toggle
-│   │   └── cart.controller.js      # Cart add, get, update quantity, remove
+│   │   ├── customer.controller.js  # Registration, login, profile, logout
+│   │   ├── product.controller.js   # Product catalog, search, filtering
+│   │   ├── wishlist.controller.js  # Wishlist add, remove, toggle
+│   │   ├── cart.controller.js      # Cart CRUD & stock limit validations
+│   │   └── order.controller.js     # Checkout, Razorpay orders, HMAC verification, history
 │   ├── models/
-│   │   ├── customer.model.js       # Customer schema (includes wishlist & cart refs)
-│   │   └── product.model.js        # Product schema & validations
+│   │   ├── customer.model.js       # Customer schema with embedded wishlist & cart
+│   │   ├── product.model.js        # Product schema with stock limits
+│   │   └── order.model.js          # Order schema with immutable price snapshots
 │   ├── routes/
 │   │   ├── customer.routes.js      # /customers endpoints
 │   │   ├── product.routes.js       # /products endpoints
 │   │   ├── wishlist.routes.js      # /wishlist endpoints (protected)
-│   │   └── cart.routes.js          # /cart endpoints (protected)
+│   │   ├── cart.routes.js          # /cart endpoints (protected)
+│   │   └── order.routes.js         # /orders endpoints (protected)
 │   ├── middlewares/
 │   │   └── auth.middleware.js      # JWT cookie verification middleware
 │   ├── utils/
-│   │   ├── generateToken.js        # Signs JWT tokens
-│   │   └── seedProducts.js         # Mock product seeder
+│   │   ├── defaultProducts.js      # Curated 30-product catalog for auto-seeding
+│   │   ├── seedProducts.js         # Manual seed script
+│   │   └── generateToken.js        # JWT token signer
 │   ├── tests/
-│   │   ├── customer.test.js        # Authentication test suite (15 tests)
-│   │   ├── product.test.js         # Product API test suite (10 tests)
-│   │   ├── wishlist.test.js        # Wishlist API test suite (14 tests)
-│   │   └── cart.test.js            # Cart API test suite (20 tests)
-│   ├── index.js                    # Express app entrypoint & MongoDB connection
+│   │   ├── customer.test.js        # Auth test suite (15 tests)
+│   │   ├── product.test.js         # Catalog test suite (10 tests)
+│   │   ├── wishlist.test.js        # Wishlist test suite (14 tests)
+│   │   ├── cart.test.js            # Shopping cart test suite (20 tests)
+│   │   └── order.test.js           # Order & Razorpay test suite (12 tests)
+│   ├── index.js                    # Server entry point & auto-seed connection
 │   ├── package.json
-│   └── .env
+│   └── .env.example
 │
 ├── frontend/
+│   ├── public/
+│   │   └── favicon.svg             # Custom ShopKart SVG squircle icon
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Navbar.jsx          # Top navigation, user session, wishlist & cart badges
-│   │   │   ├── ProductCard.jsx     # Product card with wishlist & cart integration
-│   │   │   └── SearchBar.jsx       # Search input, category dropdown & sort selector
-│   │   ├── pages/
-│   │   │   ├── Register.jsx        # Account registration page
-│   │   │   ├── Login.jsx           # User login page
-│   │   │   ├── Home.jsx            # Protected customer dashboard
-│   │   │   ├── Products.jsx        # Product discovery catalog
-│   │   │   ├── ProductDetails.jsx  # Single product details view & Add to Cart
-│   │   │   ├── Wishlist.jsx        # Wishlist page with remove & empty states
-│   │   │   └── Cart.jsx            # Cart page with stepper controls & order summary
-│   │   ├── services/
-│   │   │   └── api.js              # Centralized Axios API client
+│   │   │   ├── Navbar.jsx          # Active link highlighting, live count badges
+│   │   │   ├── Footer.jsx          # Comprehensive footer with assurances
+│   │   │   ├── ProductCard.jsx     # Card lift, toast hooks, wishlist toggle
+│   │   │   ├── SearchBar.jsx       # Real-time search, category dropdown, sort
+│   │   │   └── ScrollToTop.jsx     # Automatic route scroll reset & floating button
 │   │   ├── context/
-│   │   │   ├── AuthContext.jsx     # React context for global auth state
-│   │   │   └── CartContext.jsx     # Global cart state & derived totals
-│   │   ├── App.jsx                 # Route configurations
-│   │   ├── index.css               # Tailwind directives
+│   │   │   ├── AuthContext.jsx     # Global user authentication session
+│   │   │   ├── WishlistContext.jsx # Global wishlist state & 0ms badge sync
+│   │   │   ├── CartContext.jsx     # Global cart state, item steppers & clearCart
+│   │   │   └── ToastContext.jsx    # Real-time animated notification alerts
+│   │   ├── pages/
+│   │   │   ├── Login.jsx           # Sign in page
+│   │   │   ├── Register.jsx        # Customer registration page
+│   │   │   ├── Home.jsx            # Customer profile dashboard & password change
+│   │   │   ├── Products.jsx        # Product catalog with filters
+│   │   │   ├── ProductDetails.jsx  # Single product view with Add to Cart / Wishlist
+│   │   │   ├── Wishlist.jsx        # Saved wishlist page
+│   │   │   ├── Cart.jsx            # Shopping cart page with order summary
+│   │   │   ├── Checkout.jsx        # Shipping form & Razorpay popup launcher
+│   │   │   ├── OrderSuccess.jsx    # Order confirmation receipt page
+│   │   │   ├── Orders.jsx          # My Orders history page
+│   │   │   ├── OrderDetails.jsx    # Order view with status progression tracker
+│   │   │   └── NotFound.jsx        # 404 handler
+│   │   ├── services/
+│   │   │   └── api.js              # Centralized Axios client with withCredentials
+│   │   ├── App.jsx                 # Routing configuration
+│   │   ├── index.css               # Tailwind directives, animations & custom scrollbar
 │   │   └── main.jsx
 │   ├── package.json
+│   ├── index.html
 │   └── vite.config.js
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Setup & Installation Instructions
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or higher)
-- [MongoDB](https://www.mongodb.com/) (running locally on port `27017` or a MongoDB Atlas URI)
+* **Node.js** (v18.0.0 or higher)
+* **npm** (v9.0.0 or higher)
+* **MongoDB** (Local instance running at `mongodb://127.0.0.1:27017` or a MongoDB Atlas connection string)
+* **Razorpay Test Account** (Free from [dashboard.razorpay.com](https://dashboard.razorpay.com))
 
 ---
 
-### 1. MongoDB Setup
-Ensure MongoDB is running locally:
-```powershell
-# On Windows, check that the MongoDB service is active
-Get-Service -Name *MongoDB*
+### 1. Clone the Repository
+```bash
+git clone https://github.com/satyamshh967/mern-starter.git
+cd mern-starter
 ```
-If connecting to MongoDB Atlas or an external instance, update `MONGO_URI` in `backend/.env`.
 
 ---
 
-### 2. Backend Setup
+### 2. Backend Configuration
+1. Navigate to `backend`:
+   ```bash
+   cd backend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create your `.env` file based on `.env.example`:
+   ```bash
+   cp .env.example .env
+   ```
+4. Configure your `.env` file:
+   ```env
+   PORT=5000
+   MONGO_URI=mongodb://127.0.0.1:27017/shopkart
+   JWT_SECRET=shopkart_super_secret_jwt_key_2026_secure
+   NODE_ENV=development
+   FRONTEND_URL=http://localhost:5173
+   RAZORPAY_KEY_ID=rzp_test_yourKeyIdHere
+   RAZORPAY_KEY_SECRET=yourKeySecretHere
+   ```
+   > 🔒 **Security Notice:** The `.env` file is excluded from Git via `.gitignore`. Never commit API keys or secrets to public repositories.
+
+5. Start the backend server:
+   ```bash
+   # Development mode with nodemon
+   npm run dev
+
+   # Or standard production mode
+   npm start
+   ```
+   *The server runs on **http://localhost:5000** and will automatically seed 30 curated products if the database is empty.*
+
+---
+
+### 3. Frontend Configuration
+1. Open a new terminal and navigate to `frontend`:
+   ```bash
+   cd frontend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the Vite development server:
+   ```bash
+   npm run dev
+   ```
+4. Open **http://localhost:5173** in your browser.
+
+---
+
+## 🧪 Automated Testing
+
+The backend includes 5 automated test suites powered by **Jest** and **Supertest** running against an isolated test database (`shopkart_test`):
 
 ```bash
 cd backend
-
-# Install dependencies
-npm install
-
-# Seed initial product catalog
-npm run seed
-
-# Run automated tests
 npm test
-
-# Start the server (runs on http://localhost:5000)
-npm start
-
-# Or start in development mode with nodemon
-npm run dev
 ```
 
----
+### Test Results
+```text
+PASS tests/order.test.js (12 tests)
+PASS tests/cart.test.js (20 tests)
+PASS tests/wishlist.test.js (14 tests)
+PASS tests/customer.test.js (15 tests)
+PASS tests/product.test.js (10 tests)
 
-### 3. Frontend Setup
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start the Vite development server (runs on http://localhost:5173)
-npm run dev
+Test Suites: 5 passed, 5 total
+Tests:       71 passed, 71 total
+Snapshots:   0 total
+Time:        19.766 s
 ```
-
-Visit [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
 ## 📡 API Reference
 
-### Customer Authentication (`/customers`)
-
+### 1. Authentication (`/customers`)
 | Method | Endpoint | Description | Protected |
 |---|---|---|:---:|
 | `POST` | `/customers/register` | Register new customer (`fullName`, `email`, `password`, `phone`) | No |
-| `POST` | `/customers/login` | Authenticate customer & issue HttpOnly JWT cookie | No |
-| `GET` | `/customers/me` | Retrieve authenticated user profile | **Yes** |
-| `POST` | `/customers/logout` | Clear authentication cookie and end session | **Yes** |
-| `PATCH` | `/customers/change-password` | Update account password (`oldPassword`, `newPassword`) | **Yes** |
+| `POST` | `/customers/login` | Log in customer & issue HttpOnly JWT cookie | No |
+| `GET` | `/customers/me` | Fetch authenticated user profile | **Yes** |
+| `POST` | `/customers/logout` | Clear cookie session | **Yes** |
+| `PATCH` | `/customers/change-password` | Change user password (`oldPassword`, `newPassword`) | **Yes** |
 
----
-
-### Product Catalog (`/products`)
-
+### 2. Product Catalog (`/products`)
 | Method | Endpoint | Description | Query Parameters |
 |---|---|---|---|
-| `POST` | `/products` | Create a new product | — |
-| `GET` | `/products` | Retrieve catalog with optional search & filters | `search`, `category`, `sort=price_asc\|price_desc` |
-| `GET` | `/products/:id` | Retrieve single product by MongoDB ID | — |
+| `GET` | `/products` | Retrieve catalog with search & filtering | `search`, `category`, `sort=price_asc\|price_desc` |
+| `GET` | `/products/:id` | Fetch single product by ID | — |
+| `POST` | `/products` | Create a new catalog item | — |
 
----
-
-### Wishlist (`/wishlist`) — All Protected
-
+### 3. Wishlist (`/wishlist`) — All Protected
 | Method | Endpoint | Description | Status Codes |
 |---|---|---|---|
-| `POST` | `/wishlist/:productId` | Add product to wishlist | 200, 400, 404, 409 |
-| `GET` | `/wishlist` | Get wishlist with populated product data | 200 |
+| `GET` | `/wishlist` | Get current user's populated wishlist | 200 |
+| `POST` | `/wishlist/:productId` | Add product to wishlist | 200, 400, 409 |
 | `DELETE` | `/wishlist/:productId` | Remove product from wishlist | 200, 400, 404 |
-| `PATCH` | `/wishlist/:productId/toggle` | Toggle product in/out of wishlist | 200, 400, 404 |
+| `PATCH` | `/wishlist/:productId/toggle`| 1-click toggle in/out of wishlist | 200, 400, 404 |
 
----
-
-### Shopping Cart (`/cart`) — All Protected
-
+### 4. Shopping Cart (`/cart`) — All Protected
 | Method | Endpoint | Description | Status Codes |
 |---|---|---|---|
+| `GET` | `/cart` | Fetch user's cart populated with products | 200 |
 | `POST` | `/cart/:productId` | Add product to cart (or increment quantity) | 200, 400, 404 |
-| `GET` | `/cart` | Retrieve user's cart populated with product details | 200 |
 | `PATCH` | `/cart/:productId` | Update item quantity (`{ quantity }`) | 200, 400, 404 |
-| `DELETE` | `/cart/:productId` | Remove item from cart | 200, 400, 404 |
+| `DELETE` | `/cart/:productId` | Remove product from cart | 200, 400, 404 |
+
+### 5. Checkout & Orders (`/orders`) — All Protected
+| Method | Endpoint | Description | Status Codes |
+|---|---|---|---|
+| `POST` | `/orders/create-payment-order` | Validate cart, snapshot prices & create Razorpay order | 201, 400 |
+| `POST` | `/orders/verify-payment` | Verify HMAC-SHA256 signature, mark PAID & clear cart | 200, 400, 403 |
+| `GET` | `/orders` | Fetch authenticated user's order history (newest first) | 200 |
+| `GET` | `/orders/:id` | Fetch single order details (ownership protected) | 200, 403, 404 |
+| `PATCH`| `/orders/:id/status` | Advance delivery status (Bonus Challenge) | 200, 400, 403 |
 
 ---
 
-## 🧪 Testing
+## 💳 Testing Razorpay Payments (Test Mode)
 
-The backend includes a comprehensive Jest and Supertest suite:
+1. Sign in to your test account at [http://localhost:5173](http://localhost:5173).
+2. Add products to your cart and navigate to **Checkout**.
+3. Fill in the shipping address (10-digit phone number, 6-digit PIN).
+4. Click **Pay via Razorpay** to launch the Razorpay Standard Checkout popup.
+5. In the Razorpay modal, select **Card**:
+   * **Card Number**: `4111 1111 1111 1111`
+   * **Expiry**: Any future date (e.g. `12/28`)
+   * **CVV**: `123`
+   * On the OTP prompt, click **Success** (or enter `123456`).
+6. Upon payment verification:
+   * Backend cryptographically verifies the HMAC signature.
+   * Inventory stock is decremented.
+   * The MongoDB cart and Navbar badge reset to `0`.
+   * You are redirected to the **Order Confirmation** page.
 
-```bash
-cd backend
-npm test
-```
+---
 
-All 59 test cases run against a local test database and validate registration, password hashing, cookies, route protection, search, filtering, wishlist CRUD, and full cart business logic with stock limit checks.
+## 🔒 Security Best Practices Implemented
+
+- **No Secrets in Git**: `.env` is strictly ignored by `.gitignore`; only `.env.example` is committed.
+- **XSS & CSRF Mitigation**: JWT session tokens are stored in `HttpOnly` cookies.
+- **Server-Side Price Ownership**: Cart prices and total amounts are calculated strictly on the backend.
+- **Cryptographic Payment Integrity**: HMAC SHA-256 verification prevents fake payment confirmations.
+- **IDOR Protection**: All protected resources enforce user ownership (`req.user.id`).
+
+---
+
+## 📝 Submission Checklist
+
+- [x] **GitHub Repository**: Latest code committed and pushed to `main`.
+- [x] **Full-Stack Implementation**: Labs 01 to 06 completed and functional.
+- [x] **Database Integration**: MongoDB connection with models for Customer, Product, and Order.
+- [x] **Setup Documentation**: Complete setup instructions in `README.md`.
+- [x] **Security Adherence**: Zero API keys, passwords, or `.env` files pushed to GitHub.
+- [x] **Automated Tests**: All 71 unit and integration tests passing.
+- [x] **UI & Polish**: Favicon, smooth scrolling, toasts, and micro-interactions active.
